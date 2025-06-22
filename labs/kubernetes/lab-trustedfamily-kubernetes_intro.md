@@ -64,8 +64,7 @@ run from that directory.
 
    ```bash
    brew install lima lima-additional-guestagents colima kubectl helm
-   rm -rf ~/.colima/_templates/default.yaml
-   cat > ~/.colima/_templates/default.yaml <<EOF
+   cat > ~/.colima/_templates/tf-workshop.yaml <<EOF
    cpu: 4
    memory: 8
    runtime: containerd
@@ -122,12 +121,14 @@ run from that directory.
 3. Start Colima to create the instance, along with the Kubernetes cluster
 
    ```bash
-   colima start
+   colima start --profile=tf-workshop
    ```
 
 4. Verify your cluster is running:
 
    ```bash
+   colima ls
+   
    kubectl get nodes
    ```
 
@@ -570,7 +571,7 @@ Now, you can access `http://localhost:8888/view/trustedfamily` in your browser a
 
 ---
 
-## Step 4: Cleaning Up
+## Step 6: Cleaning Up
 
 1. Delete the service:
 
