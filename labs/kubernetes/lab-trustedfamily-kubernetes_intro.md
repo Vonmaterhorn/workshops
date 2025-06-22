@@ -128,7 +128,7 @@ run from that directory.
 
    ```bash
    colima ls
-   
+
    kubectl get nodes
    ```
 
@@ -528,7 +528,7 @@ that make the container behave the way we wish it to.
 
 ---
 
-## Step 5: Exposing Your Application
+## Step 6: Exposing Your Application
 
 The application is now deployed in the `gowiki` namespace of our cluster. Since this is a web application, we want to access it via a browser. Before we can do that, we need to expose it, through the `Service` Kubernetes resource.
 
@@ -571,7 +571,7 @@ Now, you can access `http://localhost:8888/view/trustedfamily` in your browser a
 
 ---
 
-## Step 6: Cleaning Up
+## Step 7: Cleaning Up
 
 1. Delete the service:
 
