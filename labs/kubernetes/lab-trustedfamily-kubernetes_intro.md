@@ -13,21 +13,13 @@ Kubernetes is a great platform if you need:
 - **Traffic Ingress Management**: Kubernetes is capable of processing external traffic and setting up rules on how to serve it to workloads within the cluster.
 - **Load Balancing**: Kubernetes is capable of routing traffic meant for a workload to all containers intelligently, ensuring requests are sent to containers
   that can serve them.
-- **Storage Orchestration**: Kubernetes can use a wide array of solutions for storage, ranging from built-in, local drivers, to third-party solutions running in the cloud or within the cluster. Workloads can decide on which storage to use from the optons available, and that storage can be ephemeral or persistent.
+- **Storage Orchestration**: Kubernetes can use a wide array of solutions for storage, ranging from built-in, local drivers, to third-party solutions running in the cloud or within the cluster. Workloads can decide on which storage to use from the options available, and that storage can be ephemeral or persistent.
 - **Automated rollouts and rollbacks**: You can describe the desired state for your deployed containers using Kubernetes, and it can change the actual state to the desired state at a controlled rate. For example, you can automate Kubernetes to create new containers for your deployment, remove existing containers and adopt all their resources to the new container.
 - **Automatic bin packing**: You provide Kubernetes with a cluster of nodes that it can use to run containerized tasks. You tell Kubernetes how much CPU and memory (RAM) each container needs. Kubernetes can fit containers onto your nodes to make the best use of your resources.
 - **Self-healing**: Kubernetes restarts containers that fail, replaces containers, kills containers that don't respond to your user-defined health check, and doesn't advertise them to clients until they are ready to serve.
 - **Secret and configuration management**: Kubernetes lets you store and manage sensitive information, such as passwords, OAuth tokens, and SSH keys. You can deploy and update secrets and application configuration without rebuilding your container images, and without exposing secrets in your stack configuration.
 
-## What Kubernetes is not
-
-Kubernetes isn't the solution for all runtime needs. There's a considerable management and cognitive overhead to Kubernetes infrastructure that not
-all organizations are capable of handling. Kubernetes basic concepts, while simple from an overview, are limited on what one can achieve from a platform
-perspective. The more advanced concepts can become extremely complex, be that in usage, management, or design perspectives.
-
-Kubernetes is state-oriented API. This means it's a platform where every resource relates to an API (and thus a definition), has a current and desired state,
-and is constantly checked from the former against the latter. Designs and processes that don't conform or adapt to this concept have a hard time translating
-well into Kubernetes.
+![components-of-kubernetes](../../tutorials/kubernetes/components-of-kubernetes.png)
 
 ---
 
@@ -568,6 +560,86 @@ The application is now deployed in the `gowiki` namespace of our cluster. Since 
      - To kill the background process run: `kill $!`
 
 Now, you can access `http://localhost:8888/view/trustedfamily` in your browser and start creating Wiki articles. 🎉
+
+---
+
+## Step 8: Know Your Tools
+
+Kubernetes has two first-class methods of interacting with the API:
+
+- `kubectl` is the primary way of interacting with the cluster and its resources. It's a CLI that can create, manage and interact with resources and cluster.
+
+- Kubernetes also has a [web dashboard](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/) that can be installed, if you wish to interact via browser. It provides more-or-less the same features as the CLI counterpart, though.
+
+### Quick Guide on `kubectl`
+
+We installed and used the CLI as part of the steps we carried out, but it does a lot more than what we've seen. `kubectl` can:
+
+- Create, modify and delete resources from the command-line, with autocompletion help, and validation to the command and the flags passed.
+
+  - `kubectl create <resouce>` can be used to directly create resources in the cluster, or can be used as a manifest generator to write the YAML, to then be applied (GitOps approach).
+
+  - `kubectl apply <resource manifest>` is used to apply a configuration to a resource by file name or from the stdin.
+
+  - `kubectl delete <resource>` is the inverse to `create`, and can either delete a resource by identifier, or by manifest (like `apply`).
+
+- See the resources in the cluster and their statuses.
+
+  - `kubectl get <resource>` will show status, age and some other useful information.
+
+  - `kubectl describe <resource>` will show a pretty-print of the resource definition, details and any events (if any exist). It's typically good for troubleshoot any configuration or resource issues.
+
+  - `kubectl explain <resource>` provides documentation for a resource.
+
+  - `kubectl diff <resource manifest>` compares the live version against a would-be applied version of a resource definition. Works just like a `diff` between two files.
+
+- Interact with the workloads running in the cluster.
+
+  - `kubectl attach` allows a user to _attach_ to the running process on a container. Normally, this is useful if the process has a CLI that is expecting human interaction, for example.
+
+  - `kubectl logs` is pretty self-explanatory. It gets the stdout and stderr being written in the container.
+
+  - `kubectl exec` allows to execute a command in a given container, without stopping the main process of said container. This is a very valuable debugging/troubleshooting tool, but comes at a very high security risk.
+
+  - `kubectl port-forward` creates a tunnel between the cluster and the local machine, mapping a port in the container with a port in the local host. Particularly useful to send requests to the container, via CLI or browser, for example.
+
+  - `kubectl run` creates a new container, given and image (with command being optional). This creates a pod for the container, with configurable lifecycle rules.
+
+  - `kubectl top` displays resource (CPU/memory) usage on either pods or nodes.
+
+### Using the Dashboard
+
+The dashboard provides the same functionality the CLI provides. It has a different UI, that some may prefer.
+
+To use it, follow these steps:
+
+1. Install the dashboard resources via Helm chart:
+
+   ```bash
+   helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/ --force-update
+
+   helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+   ```
+
+2. Expose the dashboard web service locally:
+
+   ```bash
+   kubectl port-forward --namespace kubernetes-dashboard svc/kubernetes-dashboard-kong-proxy 8443:443
+   ```
+
+3. Create a Service Account Token with `cluster-admin` privileges
+
+   ```bash
+   kubectl create clusterrolebinding --clusterrole cluster-admin --serviceaccount kubernetes-dashboard:default dashboard-admin-access
+   ```
+
+4. Create an Access Token for the Dashboard
+
+   ```bash
+   kubectl create token --namespace kubernetes-dashboard default
+   ```
+
+      - Use the token to login to the dashboard on https://localhost:8443
 
 ---
 
