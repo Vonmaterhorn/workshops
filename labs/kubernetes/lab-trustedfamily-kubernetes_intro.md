@@ -147,23 +147,22 @@ Kubernetes clusters created with `colima` already come with basic features, such
    apiVersion: networking.k8s.io/v1
    kind: Ingress
    metadata:
-   labels:
-      app: traefik-dashboard
-   name: traefik-dashboard
-   namespace: traefik
+     labels:
+       app: traefik-dashboard
+     name: traefik-dashboard
+     namespace: traefik
+   ingressClassName: traefik  
    spec:
-   ingressClassName: traefik
-   rules:
-   - host: traefik.lvh.me
-      http:
+     rules:
+     - host: traefik.lvh.me
+       http:
          paths:
          - backend:
-            service:
-               name: traefik
-               port:
-               name: traefik
-         path: /
-         pathType: Prefix
+             name: traefik
+             port:
+               number: traefik
+           path: /
+           pathType: Prefix
    EOF
    echo "## - Traefik Dashboard URL: http://traefik.lvh.me:30080/dashboard/ - ##"
    ```
